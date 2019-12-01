@@ -56,7 +56,7 @@ function makeRequestSoql(soql, sheetName) {
   var sheet = ss.getSheetByName(sheetName);
   
   var answer = queryResult.records;  // assumes tabular report
-  var fields = soql.substring(7, soql.indexOf('FROM')-1);
+  var fields = soql.substring(7, soql.toUpperCase().indexOf('FROM')-1); //sometimes SOQL isn't perfect, allows for mixed case "from" and "From" etc...
   var headers = fields.split(",");
   var myArray = [headers];
   
