@@ -48,34 +48,31 @@ function makeRequestSoql(soql, sheetName) {
   var name = getSfService().serviceName_;
   var obj = JSON.parse(props['oauth2.' + name]);
   var instanceUrl = obj.instance_url;
-  var queryUrl = instanceUrl + "/services/data/v21.0/query?q="+encodeURIComponent(soql);  // Actual request for report Data
+  var queryUrl = instanceUrl + "/services/data/v47.0/query?q="+encodeURIComponent(soql);  // Actual request for report Data
   var response = UrlFetchApp.fetch(queryUrl, { method : "GET", headers : { "Authorization" : "OAuth "+sfService.getAccessToken() } });
   var queryResult = JSON.parse(response.getContentText());
-  
   var ss = SpreadsheetApp.getActive();
   var sheet = ss.getSheetByName(sheetName);
   
   var answer = queryResult.records;  // assumes tabular report
-  var fields = soql.substring(7, soql.toUpperCase().indexOf('FROM')-1); //sometimes SOQL isn't perfect, allows for mixed case "from" and "From" etc...
+  var fields = soql.substring(7, soql.toUpperCase().indexOf('FROM')-1);
   var headers = fields.split(",");
   var myArray = [headers];
+  var tempArray = [];
   
   for (i = 0 ; i < answer.length ; i++ ) {
-    var tempArray = [];
     for (j = 0 ; j < headers.length ; j++) {
-      var keys = headers[j].split(".");
-      var lookAt = answer[i];
-      for (k = 0 ; k < keys.length ; k++) {
-        try { 
-          var key = keys[k];
-          lookAt = lookAt[key];
-        } 
-        catch (e) {
-          lookAt = "";
-          break;
-        }
+      try {
+        var varName="";
+        var varName=headers[j].trim(); //some headers have spaces
+        var valuePair = answer[i];
+        var varValue = valuePair[varName];
+        tempArray.push(varValue);
       }
-      tempArray.push(lookAt);
+      catch(e) {
+        varValue = "";
+        break;
+      }
     }
     myArray.push(tempArray);
   }
