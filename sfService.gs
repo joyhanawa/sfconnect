@@ -6,8 +6,9 @@
  * Steps to implement: 
  * 1. Create spreadsheet (or document) and paste this code in the associated script project
  * 2. Find the project's key
- * 3. Create a connected app in Salesforce with a callback URL https://script.google.com/macros/d/{PROJECT KEY}/usercallback (this requires Admin access)
+ * 3. Create a connected app in Salesforce with a callback URL https://script.google.com/macros/d/{SCRIPT ID}/usercallback (this requires Admin access)
  * 4. Get the Consumer Key and Consumer Secret and store them in the Script Properties (in the code below as "sfConsumerKey" and "sfConsumerSecret")
+ -  These are specific to the app created.  Currently this app is connected to my sandbox, when it's moved to production you will need new key and secret
  * 5. Set the Project Key and Scope in the function getSfService() 
  * 6. Run the showSidebar() function and click the Authorization Url in the sidebar in your spreadsheet/document (reopen your script project if the sidebar doesn't appear)
  * 7. Login and approve the connected app
@@ -24,11 +25,12 @@
 function getSfService() {
   var scriptProperties = PropertiesService.getScriptProperties();
   return OAuth2.createService('salesforce')
-    .setAuthorizationBaseUrl('https://login.salesforce.com/services/oauth2/authorize')
-    .setTokenUrl('https://login.salesforce.com/services/oauth2/token')
+    //.setAuthorizationBaseUrl('https://login.salesforce.com/services/oauth2/authorize')  // Production
+    //.setTokenUrl('https://login.salesforce.com/services/oauth2/token')  // Production
+    .setAuthorizationBaseUrl('https://test.salesforce.com/services/oauth2/authorize')  // sandbox
+    .setTokenUrl('https://test.salesforce.com/services/oauth2/token')  // sandbox
     .setClientId(scriptProperties.getProperty("sfConsumerKey"))  // Added in Script Properties
     .setClientSecret(scriptProperties.getProperty("sfConsumerSecret"))  // Added in Script Properties
-    .setProjectKey('YOUR PROJECT KEY')  // File > Project Properties
     .setCallbackFunction('authCallback')
     .setPropertyStore(PropertiesService.getUserProperties())
     .setScope('api refresh_token')  // https://help.salesforce.com/HTViewHelpDoc?id=remoteaccess_oauth_scopes.htm&language=en_US
@@ -69,4 +71,3 @@ function clearService() {
   .reset();
 }
  
-
