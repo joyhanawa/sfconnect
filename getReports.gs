@@ -58,27 +58,31 @@ function makeRequestSoql(soql, sheetName) {
   var fields = soql.substring(7, soql.toUpperCase().indexOf('FROM')-1);
   var headers = fields.split(",");
   var myArray = [headers];
-  var tempArray = [];
+
   
   for (i = 0 ; i < answer.length ; i++ ) {
+    var tempArray = [];
     for (j = 0 ; j < headers.length ; j++) {
       try {
         var varName="";
+        var valuePair = [];
         var varName=headers[j].trim(); //some headers have spaces
         var valuePair = answer[i];
         var varValue = valuePair[varName];
         tempArray.push(varValue);
-      }
-      catch(e) {
+        }
+        catch(e) {
         varValue = "";
         break;
       }
     }
     myArray.push(tempArray);
   }
-  
+
   var lastRow = sheet.getLastRow();
   if (lastRow < 1) lastRow = 1;
   sheet.getRange(1,1,lastRow, myArray[0].length).clearContent();
   sheet.getRange(1,1, myArray.length, myArray[0].length).setValues(myArray);
+
 }
+
